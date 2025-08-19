@@ -1,0 +1,79 @@
+﻿@model Task_Manager.ViewModels.AssignTaskViewModel
+@{
+    ViewData["Title"] = "Assign Task";
+}
+<h2>Assign Task</h2>
+<form asp-controller="Tasks" asp-action="AssignTask" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="form-group mb-3">
+        <label asp-for="UserId" class="form-label">Select User</label>
+        <select asp-for="UserId" class="form-select" asp-items="Model.UserList">
+            <option value="">-- Select User --</option>
+        </select>
+        <span asp-validation-for="UserId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" placeholder="Enter task title" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" placeholder="Enter task description"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="DueDate" class="form-label"></label>
+        <input asp-for="DueDate" type="date" class="form-control"
+               min="@DateTime.Today.ToString("yyyy-MM-dd")"
+               value="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+        <span asp-validation-for="DueDate" class="text-danger"></span>
+        <small class="text-muted">Due date must be today or in the future</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Assign Task</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+            // Set default due date to tomorrow
+            document.addEventListener('DOMContentLoaded', function() {
+                const dueDateInput = document.querySelector('input[type="date"]');
+                if (dueDateInput) {
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    dueDateInput.value = tomorrow.toISOString().split('T')[0];
+                }
+            });
+
+            // Additional validation before form submission
+            document.querySelector('form').addEventListener('submit', function(e) {
+                const dueDateInput = document.querySelector('input[type="date"]');
+                if (dueDateInput && dueDateInput.value) {
+                    const selectedDate = new Date(dueDateInput.value);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    if (selectedDate < today) {
+                        e.preventDefault();
+                        alert('Due date cannot be in the past. Please select a future date.');
+                        dueDateInput.focus();
+                        return false;
+                    }
+
+                    if (selectedDate.getFullYear() < 2000) {
+                        e.preventDefault();
+                        alert('Please select a valid due date.');
+                        dueDateInput.focus();
+                        return false;
+                    }
+                }
+            });
+        // </script>
+}

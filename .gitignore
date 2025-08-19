@@ -1,0 +1,25 @@
+# Build results
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio
+.vs/
+
+# Logs
+*.log
+
+# Configuration
+appsettings.Development.json
+
+# Others
+*.dbmdl
+*.bak
+*.sql

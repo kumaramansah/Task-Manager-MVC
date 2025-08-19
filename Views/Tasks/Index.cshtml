@@ -1,0 +1,204 @@
+﻿@model IEnumerable<Task_Manager.Models.TaskItem>
+@{
+    ViewData["Title"] = "My Tasks";
+    var isAdmin = User.IsInRole("Admin");
+    var pendingCount = Model?.Count(t => t.Status == Task_Manager.Models.TaskStatus.Pending) ?? 0;
+    var inProgressCount = Model?.Count(t => t.Status == Task_Manager.Models.TaskStatus.InProgress) ?? 0;
+    var completedCount = Model?.Count(t => t.Status == Task_Manager.Models.TaskStatus.Completed) ?? 0;
+}
+
+<div class="container-fluid mt-4">
+    <!-- Header with Statistics -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="bi bi-list-task"></i> @(isAdmin ? "All Tasks" : "My Tasks")
+                    </h2>
+                    <p class="text-muted mb-0">Manage and track your tasks efficiently</p>
+                </div>
+                <div>
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="AssignTask" class="btn btn-primary">
+                            <i class="bi bi-person-plus"></i> Assign Task
+                        </a>
+                        <a asp-action="Create" class="btn btn-success me-2">
+                            <i class="bi bi-plus-circle"></i> Create Task
+                        </a>
+                    }
+                </div>
+
+                <style>
+                    .border-left-primary {
+                        border-left: 0.25rem solid #4e73df !important;
+                    }
+
+                    .border-left-success {
+                        border-left: 0.25rem solid #1cc88a !important;
+                    }
+
+                    .border-left-warning {
+                        border-left: 0.25rem solid #f6c23e !important;
+                    }
+
+                    .border-left-info {
+                        border-left: 0.25rem solid #36b9cc !important;
+                    }
+
+                    .text-gray-800 {
+                        color: #5a5c69 !important;
+                    }
+
+                    .table-hover tbody tr:hover {
+                        background-color: rgba(0,0,0,.075);
+                        cursor: pointer;
+                    }
+
+                    .badge {
+                        font-size: 0.75em;
+                        padding: 0.5em 0.75em;
+                    }
+                </style>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@pendingCount</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-clock text-warning fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">In Progress</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@inProgressCount</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-arrow-clockwise text-info fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Completed</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@completedCount</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-check-circle text-success fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@(Model?.Count() ?? 0)</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-list-ul text-primary fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <table class="table table-bordered table-striped shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Created</th>
+
+                    @if (isAdmin)
+                    {
+                        <th>Assigned To</th>
+                    }
+
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model)
+                {
+                    <tr>
+                        <td>@task.Title</td>
+                        <td>@task.Description</td>
+                        <td>@task.DueDate.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            @switch (task.Status)
+                            {
+                                case Task_Manager.Models.TaskStatus.Pending:
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    break;
+                                case Task_Manager.Models.TaskStatus.InProgress:
+                                    <span class="badge bg-primary">In Progress</span>
+                                    break;
+                                case Task_Manager.Models.TaskStatus.Completed:
+                                    <span class="badge bg-success">Completed</span>
+                                    break;
+                            }
+                        </td>
+                        <td>@task.CreatedAt.ToString("yyyy-MM-dd")</td>
+
+                        @if (isAdmin)
+                        {
+                            <td>@task.User?.Email</td>
+                        }
+
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-warning">Edit</a>
+                            <a asp-action="Details" asp-route-id="@task.Id" class="btn btn-sm btn-info text-white">Details</a>
+
+                            @if (isAdmin)
+                            {
+                                <a asp-action="Delete" asp-route-id="@task.Id"
+                                   class="btn btn-sm btn-danger">Delete</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info">No tasks found. Click <b>+ Create Task</b> to create one.</div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
