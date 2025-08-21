@@ -3,6 +3,4 @@ services:
     name: task-manager-mvc
     env: docker
     plan: free
-    buildCommand: dotnet build
-    startCommand: dotnet Task-Manager-MVC.dll
     autoDeploy: true
