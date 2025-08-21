@@ -4,13 +4,13 @@ WORKDIR /src
 
 # Copy solution and project files
 COPY *.sln .
-# Copy project file
-COPY TaskManager.csproj ./
-RUN dotnet restore "./TaskManager.csproj"
+COPY TaskManager.csproj .
+RUN dotnet restore
 
-# Copy all source files and publish
+# Copy all source files
 COPY . .
-WORKDIR /src/TaskManager
+
+# Publish from the current directory (no need to change WORKDIR)
 RUN dotnet publish -c Release -o /app/publish
 
 # Step 2: Runtime stage
@@ -20,6 +20,7 @@ COPY --from=build /app/publish .
 
 # Expose default ASP.NET Core port
 EXPOSE 5000
+EXPOSE 5001
 
 # Run the application
 ENTRYPOINT ["dotnet", "TaskManager.dll"]
