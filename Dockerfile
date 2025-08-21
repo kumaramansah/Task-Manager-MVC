@@ -4,8 +4,9 @@ WORKDIR /src
 
 # Copy solution and project files
 COPY *.sln .
-COPY TaskManager/TaskManager.csproj ./TaskManager/
-RUN dotnet restore "./TaskManager/TaskManager.csproj"
+# Copy project file
+COPY TaskManager.csproj ./
+RUN dotnet restore "./TaskManager.csproj"
 
 # Copy all source files and publish
 COPY . .
