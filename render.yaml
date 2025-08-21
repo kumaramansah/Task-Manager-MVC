@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: task-manager-mvc
+    env: dotnet
+    plan: free
+    buildCommand: dotnet build
+    startCommand: dotnet Task-Manager-MVC.dll
+    autoDeploy: true
